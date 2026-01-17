@@ -48,4 +48,8 @@ export class AuthService {
   getUser() {
     return this.currentUser;
   }
+
+  isLoggedIn(): boolean {
+    return !!this.currentUser;
+  }
 }

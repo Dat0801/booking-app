@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('cart_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('order_number')->unique();
+            $table->enum('status', ['pending', 'confirmed', 'processing', 'completed', 'cancelled', 'refunded'])->default('pending');
+            $table->decimal('total_amount', 10, 2);
+            $table->string('currency', 3)->default('USD');
+            $table->enum('payment_status', ['unpaid', 'pending', 'paid', 'failed', 'refunded'])->default('unpaid');
+            $table->string('payment_method', 50)->nullable();
+            $table->text('notes')->nullable();
+            $table->timestamp('placed_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

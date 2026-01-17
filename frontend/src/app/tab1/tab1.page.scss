@@ -1,0 +1,44 @@
+.home-content {
+  --background: #f4f5f8;
+}
+
+.hero {
+  padding: 24px 16px 12px;
+}
+
+.hero h1 {
+  font-size: 24px;
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.hero p {
+  margin: 0 0 16px;
+  color: #6b6b6b;
+  font-size: 14px;
+}
+
+.search-bar {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.section {
+  padding: 8px 16px 16px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.action-card {
+  height: 100%;
+}
