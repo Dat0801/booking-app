@@ -1,17 +1,51 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      Booking App
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="home-content">
+  <div class="hero">
+    <h1>Chào mừng bạn</h1>
+    <p>Đặt tour, khách sạn và dịch vụ chỉ với vài bước.</p>
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      placeholder="Tìm kiếm điểm đến hoặc dịch vụ"
+      class="search-bar"
+    ></ion-searchbar>
+  </div>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <section class="section">
+    <div class="section-header">
+      <h2>Khám phá nhanh</h2>
+    </div>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" *ngFor="let action of quickActions">
+          <ion-card [routerLink]="action.link" class="action-card">
+            <ion-card-header>
+              <ion-card-title>{{ action.label }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Gợi ý cho bạn</h2>
+    </div>
+    <ion-list>
+      <ion-item *ngFor="let item of featuredItems" [routerLink]="item.link">
+        <ion-label>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </ion-label>
+        <ion-badge slot="end" color="primary">{{ item.tag }}</ion-badge>
+      </ion-item>
+    </ion-list>
+  </section>
 </ion-content>

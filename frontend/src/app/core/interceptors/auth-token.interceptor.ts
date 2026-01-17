@@ -1,35 +1,30 @@
-import { Injectable } from '@angular/core';
-import {
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest
-} from '@angular/common/http';
+import { inject } from '@angular/core';
+import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { StorageService } from '../services/storage.service';
 
-@Injectable()
-export class AuthTokenInterceptor implements HttpInterceptor {
-  constructor(private storage: StorageService) {}
+export const authTokenInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<any>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<any>> => {
+  const storage = inject(StorageService);
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (req.url.includes('auth/login') || req.url.includes('auth/register')) {
-      return next.handle(req);
-    }
-
-    return from(this.storage.getToken()).pipe(
-      switchMap(token => {
-        if (token) {
-          const cloned = req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          return next.handle(cloned);
-        }
-        return next.handle(req);
-      })
-    );
+  if (req.url.includes('auth/login') || req.url.includes('auth/register')) {
+    return next(req);
   }
-}
+
+  return from(storage.getToken()).pipe(
+    switchMap(token => {
+      if (token) {
+        const cloned = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        return next(cloned);
+      }
+      return next(req);
+    })
+  );
+};

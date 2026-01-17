@@ -3,62 +3,67 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: '',
     loadChildren: () => import('./tabs/tabs.routes').then((m) => m.routes),
   },
   {
     path: 'login',
-    loadComponent: () => import('./auth/login/login.page').then( m => m.LoginPage)
+    loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'register',
-    loadComponent: () => import('./auth/register/register.page').then( m => m.RegisterPage)
+    loadComponent: () => import('./auth/register/register.page').then(m => m.RegisterPage)
   },
   {
     path: 'category-list',
-    loadComponent: () => import('./catalog/category-list/category-list.page').then( m => m.CategoryListPage)
+    loadComponent: () => import('./catalog/category-list/category-list.page').then(m => m.CategoryListPage)
   },
   {
     path: 'product-list',
-    loadComponent: () => import('./catalog/product-list/product-list.page').then( m => m.ProductListPage)
+    loadComponent: () => import('./catalog/product-list/product-list.page').then(m => m.ProductListPage)
   },
   {
     path: 'product-detail',
-    loadComponent: () => import('./catalog/product-detail/product-detail.page').then( m => m.ProductDetailPage)
+    loadComponent: () => import('./catalog/product-detail/product-detail.page').then(m => m.ProductDetailPage)
   },
   {
     path: 'cart',
-    loadComponent: () => import('./cart/cart/cart.page').then( m => m.CartPage)
+    loadComponent: () => import('./cart/cart/cart.page').then(m => m.CartPage)
   },
   {
     path: 'checkout',
-    loadComponent: () => import('./cart/checkout/checkout.page').then( m => m.CheckoutPage)
+    loadComponent: () => import('./cart/checkout/checkout.page').then(m => m.CheckoutPage)
   },
   {
     path: 'order-list',
-    loadComponent: () => import('./orders/order-list/order-list.page').then( m => m.OrderListPage)
+    loadComponent: () => import('./orders/order-list/order-list.page').then(m => m.OrderListPage)
   },
   {
     path: 'order-detail',
-    loadComponent: () => import('./orders/order-detail/order-detail.page').then( m => m.OrderDetailPage)
+    loadComponent: () => import('./orders/order-detail/order-detail.page').then(m => m.OrderDetailPage)
   },
   {
     path: 'booking-list',
-    loadComponent: () => import('./bookings/booking-list/booking-list.page').then( m => m.BookingListPage)
+    loadComponent: () => import('./bookings/booking-list/booking-list.page').then(m => m.BookingListPage)
   },
   {
     path: 'booking-detail',
-    loadComponent: () => import('./bookings/booking-detail/booking-detail.page').then( m => m.BookingDetailPage)
+    loadComponent: () => import('./bookings/booking-detail/booking-detail.page').then(m => m.BookingDetailPage)
   },
   {
     path: 'booking-create',
-    loadComponent: () => import('./bookings/booking-create/booking-create.page').then( m => m.BookingCreatePage)
+    loadComponent: () => import('./bookings/booking-create/booking-create.page').then(m => m.BookingCreatePage)
   },
   {
     path: 'profile',
-    loadComponent: () => import('./profile/profile/profile.page').then( m => m.ProfilePage)
+    loadComponent: () => import('./profile/profile/profile.page').then(m => m.ProfilePage)
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./admin/dashboard/dashboard.page').then( m => m.DashboardPage)
+    loadComponent: () => import('./admin/dashboard/dashboard.page').then(m => m.DashboardPage)
   },
 ];
