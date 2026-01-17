@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Pages\Admin\Dashboard;
+use App\Livewire\Pages\Admin\Login;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::livewire('/', Login::class)->name('admin.login');
+
+Route::livewire('/admin/login', Login::class);
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::livewire('/admin', Dashboard::class)->name('admin.dashboard');
 });
