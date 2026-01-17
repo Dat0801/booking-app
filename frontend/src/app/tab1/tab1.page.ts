@@ -62,29 +62,29 @@ export class Tab1Page {
   searchQuery = '';
 
   quickActions: QuickAction[] = [
-    { label: 'Khám phá tour', link: '/category-list' },
-    { label: 'Tất cả dịch vụ', link: '/product-list' },
-    { label: 'Giỏ hàng', link: '/cart' },
-    { label: 'Đơn đặt chỗ', link: '/booking-list' }
+    { label: 'Explore tours', link: '/category-list' },
+    { label: 'All services', link: '/product-list' },
+    { label: 'Cart', link: '/cart' },
+    { label: 'Bookings', link: '/booking-list' }
   ];
 
   featuredItems: FeaturedItem[] = [
     {
-      title: 'Tour biển cuối tuần',
-      description: 'Trải nghiệm nghỉ dưỡng 3 ngày 2 đêm tại resort ven biển.',
-      tag: 'Phổ biến',
+      title: 'Weekend beach tour',
+      description: 'Enjoy a 3 days 2 nights stay at a seaside resort.',
+      tag: 'Popular',
       link: '/product-list'
     },
     {
-      title: 'Combo khách sạn + vé máy bay',
-      description: 'Tiết kiệm chi phí với gói combo linh hoạt.',
-      tag: 'Ưu đãi',
+      title: 'Hotel + flight combo',
+      description: 'Save money with flexible combo packages.',
+      tag: 'Deal',
       link: '/product-list'
     },
     {
-      title: 'Dịch vụ đưa đón sân bay',
-      description: 'Đặt xe riêng đưa đón tận nơi, an toàn, đúng giờ.',
-      tag: 'Tiện ích',
+      title: 'Airport transfer service',
+      description: 'Book private transfer, safe and on time.',
+      tag: 'Convenient',
       link: '/product-list'
     }
   ];
