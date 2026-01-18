@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Admin login')]
+#[Title('Sign in · Booking App Admin')]
 class Login extends Component
 {
     public string $email = '';
