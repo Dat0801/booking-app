@@ -1,13 +1,29 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>booking-detail</ion-title>
+    <ion-title>Booking detail</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">booking-detail</ion-title>
+      <ion-title size="large">Booking detail</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list *ngIf="booking">
+    <ion-item>
+      <ion-label>
+        <h2>Booking #{{ booking.booking_number }}</h2>
+        <p>Status: {{ booking.status }}</p>
+        <p>Payment: {{ booking.payment_status }}</p>
+        <p>
+          Date: {{ booking.scheduled_date }}
+          {{ booking.start_time }}
+        </p>
+        <p *ngIf="booking.product">Product: {{ booking.product.name }}</p>
+        <p>Total: {{ booking.total_amount }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApiService } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
 
@@ -10,9 +10,14 @@ export interface Product {
   image_url?: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  constructor(private api: ApiService) {}
+  private api = inject(ApiService);
 
   getProducts(params?: any): Observable<{ data: Product[] }> {
     return this.api.get<{ data: Product[] }>('products', params);
@@ -20,5 +25,9 @@ export class ProductService {
 
   getProduct(id: number): Observable<Product> {
     return this.api.get<Product>(`products/${id}`);
+  }
+
+  getCategories(): Observable<{ data: Category[] }> {
+    return this.api.get<{ data: Category[] }>('categories');
   }
 }
