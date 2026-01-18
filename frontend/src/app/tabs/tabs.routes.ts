@@ -12,14 +12,19 @@ export const routes: Routes = [
           import('../tab1/tab1.page').then((m) => m.Tab1Page),
       },
       {
-        path: 'tab2',
+        path: 'bookings',
         loadComponent: () =>
-          import('../tab2/tab2.page').then((m) => m.Tab2Page),
+          import('../bookings/booking-list/booking-list.page').then((m) => m.BookingListPage),
       },
       {
-        path: 'tab3',
+        path: 'catalog',
         loadComponent: () =>
-          import('../tab3/tab3.page').then((m) => m.Tab3Page),
+          import('../catalog/product-list/product-list.page').then((m) => m.ProductListPage),
+      },
+      {
+        path: 'account',
+        loadComponent: () =>
+          import('../profile/profile/profile.page').then((m) => m.ProfilePage),
       },
       {
         path: '',

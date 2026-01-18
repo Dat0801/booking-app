@@ -8,7 +8,8 @@ import {
   IonToolbar,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonBadge
 } from '@ionic/angular/standalone';
 import { RouterLink } from '@angular/router';
 import { Booking, BookingService } from '../../core/services/booking.service';
@@ -26,6 +27,7 @@ import { Booking, BookingService } from '../../core/services/booking.service';
     IonList,
     IonItem,
     IonLabel,
+    IonBadge,
     CommonModule,
     FormsModule,
     RouterLink

@@ -4,14 +4,17 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonHeader,
+  IonButtons,
+  IonBackButton,
   IonTitle,
   IonToolbar,
   IonList,
   IonItem,
   IonLabel,
-  IonButton
+  IonButton,
+  IonIcon
 } from '@ionic/angular/standalone';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
 import { CartService } from '../../core/services/cart.service';
 
@@ -23,12 +26,15 @@ import { CartService } from '../../core/services/cart.service';
   imports: [
     IonContent,
     IonHeader,
+    IonButtons,
+    IonBackButton,
     IonTitle,
     IonToolbar,
     IonList,
     IonItem,
     IonLabel,
     IonButton,
+    IonIcon,
     CommonModule,
     FormsModule,
     RouterLink
@@ -43,6 +49,7 @@ export class ProductDetailPage implements OnInit {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   ngOnInit() {
     const idParam =
@@ -82,6 +89,7 @@ export class ProductDetailPage implements OnInit {
     this.cartService.addItem(this.product.id, 1).subscribe({
       next: () => {
         this.adding = false;
+        this.router.navigate(['/cart']);
       },
       error: () => {
         this.adding = false;

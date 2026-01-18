@@ -11,6 +11,7 @@ export interface Booking {
   end_time?: string | null;
   total_amount: string;
   payment_status: string;
+  notes?: string;
   product?: {
     id: number;
     name: string;

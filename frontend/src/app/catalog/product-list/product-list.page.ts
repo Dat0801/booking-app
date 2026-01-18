@@ -4,11 +4,15 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonHeader,
+  IonButtons,
+  IonBackButton,
   IonTitle,
   IonToolbar,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonButton,
+  IonIcon
 } from '@ionic/angular/standalone';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
@@ -21,11 +25,15 @@ import { ProductService, Product } from '../services/product.service';
   imports: [
     IonContent,
     IonHeader,
+    IonButtons,
+    IonBackButton,
     IonTitle,
     IonToolbar,
     IonList,
     IonItem,
     IonLabel,
+    IonButton,
+    IonIcon,
     CommonModule,
     FormsModule,
     RouterLink
@@ -35,6 +43,7 @@ export class ProductListPage implements OnInit {
   products: Product[] = [];
   loading = false;
   categoryId?: number;
+  loadError = false;
 
   private productService = inject(ProductService);
   private route = inject(ActivatedRoute);
@@ -53,6 +62,7 @@ export class ProductListPage implements OnInit {
 
   loadProducts() {
     this.loading = true;
+    this.loadError = false;
 
     const params: any = {};
 
@@ -67,6 +77,7 @@ export class ProductListPage implements OnInit {
       },
       error: () => {
         this.loading = false;
+        this.loadError = true;
       }
     });
   }

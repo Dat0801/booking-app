@@ -3,19 +3,21 @@ import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
 import { Observable, tap } from 'rxjs';
 
+export interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+  roles: string[];
+}
+
 interface LoginResponse {
   token: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    roles: string[];
-  };
+  user: AuthUser;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private currentUser: LoginResponse['user'] | null = null;
+  private currentUser: AuthUser | null = null;
   private api = inject(ApiService);
   private storage = inject(StorageService);
 
@@ -37,6 +39,14 @@ export class AuthService {
     );
   }
 
+  fetchCurrentUser(): Observable<AuthUser> {
+    return this.api.get<AuthUser>('auth/me').pipe(
+      tap(user => {
+        this.currentUser = user;
+      })
+    );
+  }
+
   async logout(): Promise<void> {
     try {
       await this.api.post('auth/logout', {}).toPromise();
@@ -45,7 +55,7 @@ export class AuthService {
     this.currentUser = null;
   }
 
-  getUser() {
+  getUser(): AuthUser | null {
     return this.currentUser;
   }
 
