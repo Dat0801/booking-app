@@ -1,13 +1,39 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>booking-create</ion-title>
+    <ion-title>Create booking</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">booking-create</ion-title>
+      <ion-title size="large">Create booking</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Scheduled date</ion-label>
+      <ion-input [(ngModel)]="scheduledDate" placeholder="YYYY-MM-DD"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Start time</ion-label>
+      <ion-input [(ngModel)]="startTime" placeholder="HH:MM"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">End time (optional)</ion-label>
+      <ion-input [(ngModel)]="endTime" placeholder="HH:MM"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Notes</ion-label>
+      <ion-input [(ngModel)]="notes"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" color="primary" (click)="submit()" [disabled]="submitting">
+    Create booking
+  </ion-button>
 </ion-content>

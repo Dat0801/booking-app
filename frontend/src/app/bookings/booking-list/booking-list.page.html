@@ -1,13 +1,30 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>booking-list</ion-title>
+    <ion-title>Bookings</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">booking-list</ion-title>
+      <ion-title size="large">Bookings</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list *ngIf="bookings.length">
+    <ion-item
+      *ngFor="let booking of bookings"
+      [routerLink]="['/booking-detail']"
+      [queryParams]="{ id: booking.id }"
+    >
+      <ion-label>
+        <h2>Booking #{{ booking.booking_number }}</h2>
+        <p>
+          {{ booking.scheduled_date }}
+          {{ booking.start_time }}
+        </p>
+        <p>Status: {{ booking.status }} | Payment: {{ booking.payment_status }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

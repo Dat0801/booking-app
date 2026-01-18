@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
 import { Observable, tap } from 'rxjs';
@@ -16,8 +16,8 @@ interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private currentUser: LoginResponse['user'] | null = null;
-
-  constructor(private api: ApiService, private storage: StorageService) {}
+  private api = inject(ApiService);
+  private storage = inject(StorageService);
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.api.post<LoginResponse>('auth/login', { email, password }).pipe(

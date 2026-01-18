@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -40,13 +40,11 @@ export class LoginPage implements OnInit {
   form!: FormGroup;
   submitting = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router,
-    private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController
-  ) {}
+  private fb = inject(FormBuilder);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private loadingCtrl = inject(LoadingController);
+  private toastCtrl = inject(ToastController);
 
   ngOnInit(): void {
     this.form = this.fb.group({

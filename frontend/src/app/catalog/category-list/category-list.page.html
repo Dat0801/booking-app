@@ -1,13 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>category-list</ion-title>
+    <ion-title>Categories</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">category-list</ion-title>
+      <ion-title size="large">Categories</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list *ngIf="!loading">
+    <ion-item
+      *ngFor="let category of categories"
+      [routerLink]="['/product-list']"
+      [queryParams]="{ category_id: category.id }"
+    >
+      <ion-label>
+        <h2>{{ category.name }}</h2>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>
