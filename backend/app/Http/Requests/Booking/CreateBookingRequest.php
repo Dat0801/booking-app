@@ -6,23 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CreateBookingRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'scheduled_date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after_or_equal:start_time'],
+            'notes' => ['nullable', 'string'],
+            'total_amount' => ['required', 'numeric', 'min:0'],
         ];
     }
 }
