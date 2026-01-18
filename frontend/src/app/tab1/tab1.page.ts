@@ -62,10 +62,10 @@ export class Tab1Page {
   searchQuery = '';
 
   quickActions: QuickAction[] = [
-    { label: 'Explore tours', link: '/category-list' },
-    { label: 'All services', link: '/product-list' },
+    { label: 'Explore tours', link: '/tabs/catalog' },
+    { label: 'All services', link: '/tabs/catalog' },
     { label: 'Cart', link: '/cart' },
-    { label: 'Bookings', link: '/booking-list' }
+    { label: 'Bookings', link: '/tabs/bookings' }
   ];
 
   featuredItems: FeaturedItem[] = [
@@ -73,19 +73,19 @@ export class Tab1Page {
       title: 'Weekend beach tour',
       description: 'Enjoy a 3 days 2 nights stay at a seaside resort.',
       tag: 'Popular',
-      link: '/product-list'
+      link: '/tabs/catalog'
     },
     {
       title: 'Hotel + flight combo',
       description: 'Save money with flexible combo packages.',
       tag: 'Deal',
-      link: '/product-list'
+      link: '/tabs/catalog'
     },
     {
       title: 'Airport transfer service',
       description: 'Book private transfer, safe and on time.',
       tag: 'Convenient',
-      link: '/product-list'
+      link: '/tabs/catalog'
     }
   ];
 }

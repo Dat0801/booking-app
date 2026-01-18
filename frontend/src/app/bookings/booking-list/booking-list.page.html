@@ -11,20 +11,39 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-list *ngIf="bookings.length">
+  <ion-list *ngIf="!loading && bookings.length" class="booking-list">
     <ion-item
       *ngFor="let booking of bookings"
       [routerLink]="['/booking-detail']"
       [queryParams]="{ id: booking.id }"
     >
       <ion-label>
-        <h2>Booking #{{ booking.booking_number }}</h2>
-        <p>
+        <h2>
+          {{ booking.product?.name || ('Booking #' + booking.booking_number) }}
+        </h2>
+        <p class="booking-meta">
           {{ booking.scheduled_date }}
           {{ booking.start_time }}
         </p>
-        <p>Status: {{ booking.status }} | Payment: {{ booking.payment_status }}</p>
+        <p class="booking-meta">
+          Total: {{ booking.total_amount }}
+        </p>
+        <p class="booking-meta">
+          Payment: {{ booking.payment_status }}
+        </p>
       </ion-label>
+      <ion-badge slot="end" color="primary">
+        {{ booking.status }}
+      </ion-badge>
     </ion-item>
   </ion-list>
+
+  <div *ngIf="loading" class="booking-loading">
+    Loading bookings...
+  </div>
+
+  <div *ngIf="!loading && !bookings.length" class="empty-state">
+    <h3>No bookings yet</h3>
+    <p>Your bookings will appear here after you create them.</p>
+  </div>
 </ion-content>

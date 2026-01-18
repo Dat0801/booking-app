@@ -1,6 +1,14 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
     <ion-title>Products</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/cart']">
+        <ion-icon aria-hidden="true" name="cart"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -11,7 +19,7 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-list *ngIf="!loading">
+  <ion-list *ngIf="!loading && products.length">
     <ion-item *ngFor="let product of products" [routerLink]="['/product-detail']" [queryParams]="{ id: product.id }">
       <ion-label>
         <h2>{{ product.name }}</h2>
@@ -19,4 +27,12 @@
       </ion-label>
     </ion-item>
   </ion-list>
+
+  <div *ngIf="!loading && !products.length && !loadError" class="empty-state">
+    <p>No products or services available.</p>
+  </div>
+
+  <div *ngIf="!loading && loadError" class="empty-state">
+    <p>Unable to load products. Please check the server or sign in again.</p>
+  </div>
 </ion-content>

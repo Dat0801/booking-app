@@ -11,19 +11,44 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-list *ngIf="booking">
-    <ion-item>
+  <ion-list *ngIf="booking" class="booking-detail-list">
+    <ion-item lines="none">
       <ion-label>
-        <h2>Booking #{{ booking.booking_number }}</h2>
-        <p>Status: {{ booking.status }}</p>
-        <p>Payment: {{ booking.payment_status }}</p>
-        <p>
-          Date: {{ booking.scheduled_date }}
+        <h2>
+          {{ booking.product?.name || ('Booking #' + booking.booking_number) }}
+        </h2>
+        <p class="booking-meta">
+          Booking #{{ booking.booking_number }}
+        </p>
+        <p class="booking-meta">
+          Date:
+          {{ booking.scheduled_date }}
           {{ booking.start_time }}
         </p>
-        <p *ngIf="booking.product">Product: {{ booking.product.name }}</p>
-        <p>Total: {{ booking.total_amount }}</p>
+        <p class="booking-meta" *ngIf="booking.end_time">
+          End time:
+          {{ booking.end_time }}
+        </p>
+        <p class="booking-meta" *ngIf="booking.product">
+          Product:
+          {{ booking.product.name }}
+        </p>
+        <p class="booking-meta">
+          Total:
+          {{ booking.total_amount }}
+        </p>
+        <p class="booking-meta">
+          Payment:
+          {{ booking.payment_status }}
+        </p>
+        <p class="booking-meta" *ngIf="booking.notes">
+          Notes:
+          {{ booking.notes }}
+        </p>
       </ion-label>
+      <ion-badge slot="end" color="primary">
+        {{ booking.status }}
+      </ion-badge>
     </ion-item>
   </ion-list>
 </ion-content>
