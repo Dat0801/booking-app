@@ -13,6 +13,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <button 
+                        wire:click="exportCSV()"
                         class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition border border-slate-600"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +22,7 @@
                         Export CSV
                     </button>
                     <button 
-                        wire:click="editUser(null)"
+                        wire:click="openForm()"
                         class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,6 +35,56 @@
 
             <!-- Content -->
             <div class="p-8 space-y-8">
+                <!-- Flash Message -->
+                @if (session('message'))
+                    <div class="bg-green-600 text-white px-6 py-3 rounded-lg flex justify-between items-center animate-pulse">
+                        <span>{{ session('message') }}</span>
+                        <button class="text-2xl">&times;</button>
+                    </div>
+                @endif
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-blue-200 mb-2">Total Users</p>
+                                <p class="text-4xl font-bold">{{ $totalUsers }}</p>
+                                <p class="text-blue-200 text-sm mt-2">👥 Users & Partners</p>
+                            </div>
+                            <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.488M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a9 9 0 0118 0v2h2v-2a11 11 0 00-20 0v2h2v-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-green-600 to-green-700 p-6 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-green-200 mb-2">Active Users</p>
+                                <p class="text-4xl font-bold">{{ $activeUsers }}</p>
+                                <p class="text-green-200 text-sm mt-2">✅ Currently active</p>
+                            </div>
+                            <svg class="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-red-200 mb-2">Banned Users</p>
+                                <p class="text-4xl font-bold">{{ $bannedUsers }}</p>
+                                <p class="text-red-200 text-sm mt-2">❌ Inactive/Banned</p>
+                            </div>
+                            <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Search & Filter Bar -->
                 <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -43,36 +94,20 @@
                             </svg>
                             <input 
                                 type="text" 
-                                wire:model.debounce.500ms="search"
+                                wire:model.live="searchTerm"
                                 placeholder="Search by name, email, or ID..."
                                 class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
                             >
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Role</label>
-                            <select 
-                                wire:model="role"
-                                class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
-                            >
-                                <option value="">All Roles</option>
-                                @foreach($roles as $roleItem)
-                                    <option value="{{ $roleItem->name }}">{{ $roleItem->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
-                            <select 
-                                wire:model="isActive"
-                                class="px-4 py-2 w-full bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
-                            >
-                                <option value="">All Users</option>
-                                <option value="1">Active</option>
-                                <option value="0">Banned</option>
-                            </select>
-                        </div>
+                        <select 
+                            wire:model.live="filterStatus"
+                            class="px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
+                        >
+                            <option value="all">All Users</option>
+                            <option value="active">Active</option>
+                            <option value="banned">Banned</option>
+                        </select>
                     </div>
                 </div>
 
@@ -105,7 +140,7 @@
                                         <td class="px-6 py-4 text-slate-300">{{ $user->email }}</td>
                                         <td class="px-6 py-4 text-slate-400">{{ $user->created_at->format('M d, Y') }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="font-semibold text-blue-400">{{ $user->bookings_count ?? 0 }}</span>
+                                            <span class="font-semibold text-blue-400">{{ $user->bookings()->count() }}</span>
                                         </td>
                                         <td class="px-6 py-4">
                                             <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $user->is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' }}">
@@ -115,12 +150,23 @@
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-3">
                                                 <button 
-                                                    wire:click="editUser({{ $user->id }})"
+                                                    wire:click="openForm({{ $user->id }})"
                                                     class="text-blue-400 hover:text-blue-300 transition"
                                                     title="Edit"
                                                 >
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                </button>
+                                                <button 
+                                                    wire:click="toggleActive({{ $user->id }})"
+                                                    wire:confirm="Are you sure?"
+                                                    class="text-yellow-400 hover:text-yellow-300 transition"
+                                                    title="{{ $user->is_active ? 'Ban' : 'Activate' }}"
+                                                >
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                     </svg>
                                                 </button>
                                                 <button 
@@ -133,17 +179,6 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                                     </svg>
                                                 </button>
-                                                @if($user->deleted_at)
-                                                    <button
-                                                        wire:click="restoreUser({{ $user->id }})"
-                                                        class="text-green-400 hover:text-green-300 transition"
-                                                        title="Restore"
-                                                    >
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                    </button>
-                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -178,22 +213,22 @@
     </div>
 
     <!-- Add/Edit User Modal -->
-    @if ($showFormModal)
+    @if ($showForm)
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 w-full max-w-md">
-                <h2 class="text-2xl font-bold mb-6">{{ $userId ? 'Edit User' : 'Add New User' }}</h2>
+                <h2 class="text-2xl font-bold mb-6">{{ $editingUserId ? 'Edit User' : 'Add New User' }}</h2>
 
-                <form wire:submit.prevent="saveUser" class="space-y-4">
+                <form wire:submit="saveUser" class="space-y-4">
                     <!-- Name -->
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
                         <input 
                             type="text" 
-                            wire:model="formName"
-                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('formName') border-red-500 @enderror"
+                            wire:model="name"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('name') border-red-500 @enderror"
                             placeholder="John Doe"
                         >
-                        @error('formName') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                        @error('name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Email -->
@@ -201,11 +236,25 @@
                         <label class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
                         <input 
                             type="email" 
-                            wire:model="formEmail"
-                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('formEmail') border-red-500 @enderror"
+                            wire:model="email"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('email') border-red-500 @enderror"
                             placeholder="john@example.com"
                         >
-                        @error('formEmail') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                        @error('email') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">
+                            Password {{ $editingUserId ? '(Leave empty to keep current)' : '' }}
+                        </label>
+                        <input 
+                            type="password" 
+                            wire:model="password"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('password') border-red-500 @enderror"
+                            placeholder="••••••••"
+                        >
+                        @error('password') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Phone -->
@@ -213,50 +262,30 @@
                         <label class="block text-sm font-medium text-slate-300 mb-2">Phone (Optional)</label>
                         <input 
                             type="text" 
-                            wire:model="formPhone"
-                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('formPhone') border-red-500 @enderror"
+                            wire:model="phone"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 @error('phone') border-red-500 @enderror"
                             placeholder="+1 234 567 8900"
                         >
-                        @error('formPhone') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                        @error('phone') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                     </div>
 
-                    <!-- Status -->
+                    <!-- Active Status -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
-                        <select 
-                            wire:model="formIsActive"
-                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500 @error('formIsActive') border-red-500 @enderror"
-                        >
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                        @error('formIsActive') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- Roles -->
-                    <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Roles</label>
-                        <div class="space-y-2 bg-slate-700/50 p-3 rounded border border-slate-600">
-                            @foreach($roles as $roleItem)
-                                <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
-                                    <input 
-                                        type="checkbox" 
-                                        value="{{ $roleItem->name }}"
-                                        wire:model="formRoles"
-                                        class="w-4 h-4 rounded bg-slate-700 border border-slate-600 accent-blue-600"
-                                    >
-                                    <span>{{ $roleItem->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('formRoles') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                wire:model="is_active"
+                                class="w-4 h-4 rounded bg-slate-700 border border-slate-600 accent-blue-600"
+                            >
+                            <span class="text-slate-300">User is Active</span>
+                        </label>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex gap-3 pt-6">
                         <button 
                             type="button"
-                            wire:click="$set('showFormModal', false)"
+                            wire:click="closeForm()"
                             class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded font-semibold transition"
                         >
                             Cancel
@@ -265,7 +294,7 @@
                             type="submit"
                             class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded font-semibold transition"
                         >
-                            {{ $userId ? 'Update' : 'Create' }}
+                            {{ $editingUserId ? 'Update' : 'Create' }}
                         </button>
                     </div>
                 </form>

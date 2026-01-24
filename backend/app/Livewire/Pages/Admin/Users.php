@@ -70,8 +70,14 @@ class Users extends Component
         $this->resetPage();
     }
 
-    public function editUser(int $id): void
+    public function editUser(?int $id): void
     {
+        if ($id === null) {
+            $this->resetForm();
+            $this->showFormModal = true;
+            return;
+        }
+
         $user = User::withTrashed()->with('roles')->findOrFail($id);
 
         $this->userId = $user->id;
@@ -85,28 +91,41 @@ class Users extends Component
 
     public function saveUser(): void
     {
-        if (! $this->userId) {
-            return;
+        // Validate data - adjust uniqueness for creation vs update
+        if ($this->userId) {
+            $data = $this->validate([
+                'formName' => ['required', 'string', 'max:255'],
+                'formEmail' => ['required', 'email', 'max:255', 'unique:users,email,' . $this->userId],
+                'formPhone' => ['nullable', 'string', 'max:50'],
+                'formIsActive' => ['required', 'in:0,1'],
+                'formRoles' => ['array'],
+                'formRoles.*' => ['string', 'distinct'],
+            ]);
+
+            $user = User::withTrashed()->findOrFail($this->userId);
+            $user->name = $data['formName'];
+            $user->email = $data['formEmail'];
+            $user->phone = $data['formPhone'] !== '' ? $data['formPhone'] : null;
+            $user->is_active = $data['formIsActive'] === '1';
+            $user->save();
+        } else {
+            $data = $this->validate([
+                'formName' => ['required', 'string', 'max:255'],
+                'formEmail' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'formPhone' => ['nullable', 'string', 'max:50'],
+                'formIsActive' => ['required', 'in:0,1'],
+                'formRoles' => ['array'],
+                'formRoles.*' => ['string', 'distinct'],
+            ]);
+
+            $user = User::create([
+                'name' => $data['formName'],
+                'email' => $data['formEmail'],
+                'phone' => $data['formPhone'] !== '' ? $data['formPhone'] : null,
+                'is_active' => $data['formIsActive'] === '1',
+                'password' => bcrypt('password123'), // Default password
+            ]);
         }
-
-        $id = $this->userId;
-
-        $data = $this->validate([
-            'formName' => ['required', 'string', 'max:255'],
-            'formEmail' => ['required', 'email', 'max:255', 'unique:users,email,' . $id],
-            'formPhone' => ['nullable', 'string', 'max:50'],
-            'formIsActive' => ['required', 'in:0,1'],
-            'formRoles' => ['array'],
-            'formRoles.*' => ['string', 'distinct'],
-        ]);
-
-        $user = User::withTrashed()->findOrFail($id);
-
-        $user->name = $data['formName'];
-        $user->email = $data['formEmail'];
-        $user->phone = $data['formPhone'] !== '' ? $data['formPhone'] : null;
-        $user->is_active = $data['formIsActive'] === '1';
-        $user->save();
 
         if (! empty($data['formRoles'])) {
             $roleIds = Role::query()
@@ -115,10 +134,13 @@ class Users extends Component
                 ->all();
 
             $user->roles()->sync($roleIds);
+        } else {
+            $user->roles()->sync([]);
         }
 
         $this->showFormModal = false;
         $this->resetForm();
+        $this->resetPage();
     }
 
     public function deleteUser(int $id): void

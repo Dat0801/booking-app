@@ -28,7 +28,7 @@ class Bookings extends Component
 
     public bool $withDeleted = false;
 
-    public int $perPage = 15;
+    public int $perPage = 10;
 
     public ?int $editingBookingId = null;
 
@@ -124,6 +124,11 @@ class Bookings extends Component
         $this->editingBookingId = null;
     }
 
+    public function deleteBooking(int $id): void
+    {
+        Booking::findOrFail($id)->delete();
+    }
+
     public function render()
     {
         $query = Booking::query()->with(['user', 'product', 'payments']);
@@ -172,8 +177,20 @@ class Bookings extends Component
             ->orderByDesc('id')
             ->paginate($this->perPage);
 
+        // Calculate statistics
+        $allBookings = Booking::query();
+        $monthlyRevenue = Booking::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total_amount');
+        
+        $totalBookings = $allBookings->count();
+        $pendingCount = Booking::where('status', 'pending')->count();
+
         return view('pages.admin.bookings', [
             'bookings' => $bookings,
+            'monthlyRevenue' => $monthlyRevenue,
+            'totalBookings' => $totalBookings,
+            'pendingCount' => $pendingCount,
         ]);
     }
 }

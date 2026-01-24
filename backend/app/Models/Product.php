@@ -21,6 +21,19 @@ class Product extends Model
         'stock_quantity',
         'is_active',
         'image_url',
+        'location',
+        'rating',
+        'review_count',
+        'gallery',
+        'amenities',
+        'reviews',
+    ];
+
+    protected $casts = [
+        'gallery' => 'array',
+        'amenities' => 'array',
+        'reviews' => 'array',
+        'rating' => 'float',
     ];
 
     public function category()
