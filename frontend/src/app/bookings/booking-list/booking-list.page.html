@@ -1,49 +1,153 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="booking-header">
   <ion-toolbar>
     <ion-title>Bookings</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Bookings</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-list *ngIf="!loading && bookings.length" class="booking-list">
-    <ion-item
-      *ngFor="let booking of bookings"
-      [routerLink]="['/booking-detail']"
-      [queryParams]="{ id: booking.id }"
-    >
-      <ion-label>
-        <h2>
-          {{ booking.product?.name || ('Booking #' + booking.booking_number) }}
-        </h2>
-        <p class="booking-meta">
-          {{ booking.scheduled_date }}
-          {{ booking.start_time }}
-        </p>
-        <p class="booking-meta">
-          Total: {{ booking.total_amount }}
-        </p>
-        <p class="booking-meta">
-          Payment: {{ booking.payment_status }}
-        </p>
-      </ion-label>
-      <ion-badge slot="end" color="primary">
-        {{ booking.status }}
-      </ion-badge>
-    </ion-item>
-  </ion-list>
-
-  <div *ngIf="loading" class="booking-loading">
-    Loading bookings...
+<ion-content [fullscreen]="true" class="booking-content">
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Search</label>
+        <input
+          type="text"
+          placeholder="Booking number or customer"
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          class="filter-input"
+        />
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select [(ngModel)]="selectedStatus" (change)="onFilterChange()" class="filter-input">
+          <option value="">Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Payment status</label>
+        <select [(ngModel)]="selectedPaymentStatus" (change)="onFilterChange()" class="filter-input">
+          <option value="">Payment status</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="unpaid">Unpaid</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>User ID</label>
+        <input
+          type="text"
+          placeholder="0"
+          [(ngModel)]="filterUserId"
+          (input)="onFilterChange()"
+          class="filter-input"
+        />
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Product ID</label>
+        <input
+          type="text"
+          placeholder="0"
+          [(ngModel)]="filterProductId"
+          (input)="onFilterChange()"
+          class="filter-input"
+        />
+      </div>
+      <div class="filter-group">
+        <label>From date</label>
+        <input
+          type="date"
+          [(ngModel)]="filterFromDate"
+          (change)="onFilterChange()"
+          class="filter-input"
+          placeholder="dd/mm/yyyy"
+        />
+      </div>
+      <div class="filter-group">
+        <label>To date</label>
+        <input
+          type="date"
+          [(ngModel)]="filterToDate"
+          (change)="onFilterChange()"
+          class="filter-input"
+          placeholder="dd/mm/yyyy"
+        />
+      </div>
+      <div class="filter-group checkbox-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="includeDeleted" (change)="onFilterChange()" />
+          Include deleted
+        </label>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="!loading && !bookings.length" class="empty-state">
-    <h3>No bookings yet</h3>
-    <p>Your bookings will appear here after you create them.</p>
+  <!-- Bookings Table -->
+  <div class="table-wrapper">
+    <table class="bookings-table" *ngIf="!loading && filteredBookings.length">
+      <thead>
+        <tr>
+          <th>Booking</th>
+          <th>Customer</th>
+          <th>Product</th>
+          <th>Status</th>
+          <th>Payment</th>
+          <th>Scheduled at</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let booking of filteredBookings" class="booking-row">
+          <td>
+            <span class="booking-id">#{{ booking.booking_number || booking.id }}</span>
+          </td>
+          <td>
+            <div class="customer-info">
+              <div class="customer-name">{{ booking.guest_name }}</div>
+              <div class="customer-email">{{ booking.guest_email }}</div>
+            </div>
+          </td>
+          <td>{{ booking.product?.name || '-' }}</td>
+          <td>
+            <span [ngClass]="'status-badge status-' + (booking.status | lowercase)">
+              {{ booking.status }}
+            </span>
+          </td>
+          <td>
+            <span [ngClass]="'payment-badge payment-' + (booking.payment_status | lowercase)">
+              {{ booking.payment_status }}
+            </span>
+          </td>
+          <td>{{ booking.scheduled_date | date:'MMM dd, yyyy' }}</td>
+          <td class="actions-cell">
+            <button class="action-btn" title="View">👁️</button>
+            <button class="action-btn" title="Edit">✏️</button>
+            <button class="action-btn" title="Delete">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !filteredBookings.length" class="empty-state-table">
+      <p>No bookings found.</p>
+    </div>
+  </div>
+
+  <!-- Pagination Info -->
+  <div class="pagination-info" *ngIf="!loading">
+    <p>Showing {{ filteredBookings.length === 0 ? 0 : 1 }} to {{ filteredBookings.length }} of {{ bookings.length }} bookings</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="booking-loading">
+    <ion-spinner></ion-spinner>
+    <p>Loading bookings...</p>
   </div>
 </ion-content>

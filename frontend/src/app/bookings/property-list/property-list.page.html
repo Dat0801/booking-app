@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="header-title">
+        <h2>{{ location }}, {{ guests }} guests</h2>
+        <p class="date-range">{{ dateRange }}</p>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openFilters()">
+        <ion-icon slot="icon-only" name="options-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  
+  <ion-toolbar class="filter-toolbar">
+    <ion-segment [(ngModel)]="selectedFilter" (ionChange)="onFilterChange($event)">
+      <ion-segment-button value="dates">
+        <ion-label>Dates</ion-label>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="price">
+        <ion-label>Price</ion-label>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="type">
+        <ion-label>Type</ion-label>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="more">
+        <ion-label>More</ion-label>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="property-count" *ngIf="!loading">
+    {{ properties.length }}+ places in {{ location }}
+  </div>
+
+  <ion-list *ngIf="!loading && properties.length" class="property-list">
+    <div *ngFor="let property of properties" class="property-card">
+      <div class="property-image-container">
+        <img [src]="property.image" [alt]="property.name" class="property-image" />
+        <ion-button 
+          class="favorite-btn" 
+          fill="clear" 
+          (click)="toggleFavorite(property)"
+        >
+          <ion-icon 
+            [name]="property.isFavorite ? 'heart' : 'heart-outline'" 
+            [color]="property.isFavorite ? 'danger' : 'light'"
+          ></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="property-details" (click)="viewProperty(property)">
+        <div class="property-header">
+          <h2 class="property-name">{{ property.name }}</h2>
+          <div class="property-rating">
+            <ion-icon name="star" color="primary"></ion-icon>
+            <span>{{ property.rating }}</span>
+          </div>
+        </div>
+
+        <div class="property-info">
+          <p class="reviews-distance">
+            {{ property.reviewCount }} reviews • {{ property.distanceFromCenter }}
+          </p>
+        </div>
+
+        <div class="property-footer">
+          <div class="price-container">
+            <span class="price">${{ property.pricePerNight }}</span>
+            <span class="per-night"> / night</span>
+          </div>
+          <ion-button class="view-btn" (click)="viewProperty(property); $event.stopPropagation()">
+            View
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ion-list>
+
+  <div *ngIf="loading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading properties...</p>
+  </div>
+
+  <div *ngIf="!loading && !properties.length" class="empty-state">
+    <ion-icon name="home-outline" size="large"></ion-icon>
+    <h3>No properties found</h3>
+    <p>Try adjusting your search filters</p>
+  </div>
+</ion-content>

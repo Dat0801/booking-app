@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\ProductController;
+use App\Http\Controllers\Api\V1\Customer\PropertyController;
 use App\Http\Controllers\Api\V1\Customer\CartController;
 use App\Http\Controllers\Api\V1\Customer\OrderController;
 use App\Http\Controllers\Api\V1\Customer\BookingController;
@@ -17,6 +18,8 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/login', [AuthController::class, 'login']);
 
     Route::get('categories', [ProductController::class, 'categories']);
+    Route::get('properties', [PropertyController::class, 'index']);
+    Route::get('properties/{id}', [PropertyController::class, 'show']);
     Route::get('products', [ProductController::class, 'index']);
     Route::get('products/{id}', [ProductController::class, 'show']);
 
@@ -50,6 +53,8 @@ Route::prefix('v1')->group(function () {
             Route::patch('orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
 
             Route::get('bookings', [AdminBookingController::class, 'index']);
+            Route::get('bookings/filter-options', [AdminBookingController::class, 'filterOptions']);
+            Route::get('bookings/statistics', [AdminBookingController::class, 'statistics']);
             Route::get('bookings/{id}', [AdminBookingController::class, 'show']);
             Route::patch('bookings/{id}/status', [AdminBookingController::class, 'updateStatus']);
 

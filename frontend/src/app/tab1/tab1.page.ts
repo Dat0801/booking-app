@@ -1,35 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonContent,
-  IonSearchbar,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonBadge
+  IonIcon
 } from '@ionic/angular/standalone';
-import { RouterLink } from '@angular/router';
 
-interface QuickAction {
-  label: string;
-  link: string;
+interface Category {
+  id: string;
+  name: string;
+  active: boolean;
 }
 
-interface FeaturedItem {
-  title: string;
-  description: string;
-  tag: string;
-  link: string;
+interface Destination {
+  name: string;
+  type: string;
+  image: string;
+}
+
+interface Deal {
+  name: string;
+  location: string;
+  rating: number;
+  originalPrice: string;
+  price: string;
+  image: string;
 }
 
 @Component({
@@ -40,52 +38,80 @@ interface FeaturedItem {
   imports: [
     IonHeader,
     IonToolbar,
-    IonTitle,
     IonContent,
-    IonSearchbar,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonBadge,
+    IonIcon,
     CommonModule,
-    FormsModule,
-    RouterLink
+    FormsModule
   ]
 })
 export class Tab1Page {
-  searchQuery = '';
+  private router = inject(Router);
 
-  quickActions: QuickAction[] = [
-    { label: 'Explore tours', link: '/tabs/catalog' },
-    { label: 'All services', link: '/tabs/catalog' },
-    { label: 'Cart', link: '/cart' },
-    { label: 'Bookings', link: '/tabs/bookings' }
+  categories: Category[] = [
+    { id: 'hotels', name: 'Hotels', active: true },
+    { id: 'villas', name: 'Villas', active: false },
+    { id: 'resorts', name: 'Resorts', active: false },
+    { id: 'more', name: 'More', active: false }
   ];
 
-  featuredItems: FeaturedItem[] = [
+  featuredDestinations: Destination[] = [
     {
-      title: 'Weekend beach tour',
-      description: 'Enjoy a 3 days 2 nights stay at a seaside resort.',
-      tag: 'Popular',
-      link: '/tabs/catalog'
+      name: 'Santorini, Greece',
+      type: 'TRENDING DESTINATION',
+      image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=400&h=300&fit=crop'
     },
     {
-      title: 'Hotel + flight combo',
-      description: 'Save money with flexible combo packages.',
-      tag: 'Deal',
-      link: '/tabs/catalog'
-    },
-    {
-      title: 'Airport transfer service',
-      description: 'Book private transfer, safe and on time.',
-      tag: 'Convenient',
-      link: '/tabs/catalog'
+      name: 'Kyoto, Japan',
+      type: 'CULTURAL HUB',
+      image: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400&h=300&fit=crop'
     }
   ];
+
+  lastMinuteDeals: Deal[] = [
+    {
+      name: 'Grand Hyatt Residence',
+      location: 'Zurich, Switzerland',
+      rating: 4.9,
+      originalPrice: '#320',
+      price: '$185',
+      image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop'
+    },
+    {
+      name: 'Azure Coast Villas',
+      location: 'Algarve, Portugal',
+      rating: 4.7,
+      originalPrice: '#210',
+      price: '$125',
+      image: 'https://images.unsplash.com/photo-1618773928121-c1131f3ace4c?w=400&h=300&fit=crop'
+    },
+    {
+      name: 'Studio Midtown Loft',
+      location: 'London, UK',
+      rating: 4.8,
+      originalPrice: '#170',
+      price: '$99',
+      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop'
+    }
+  ];
+
+  selectCategory(categoryId: string) {
+    this.categories.forEach(cat => {
+      cat.active = cat.id === categoryId;
+    });
+  }
+
+  navigateToPropertyList(location?: string) {
+    const queryParams: any = {};
+    
+    if (location) {
+      queryParams.location = location;
+    } else {
+      queryParams.location = 'Paris';
+    }
+    
+    queryParams.guests = 2;
+    queryParams.dateRange = 'Jun 12 - Jun 18';
+
+    this.router.navigate(['/property-list'], { queryParams });
+  }
 }

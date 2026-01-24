@@ -1,45 +1,167 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
+<ion-header [translucent]="true" class="header-transparent">
+  <ion-toolbar class="toolbar-transparent">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/catalog"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/catalog" class="back-button"></ion-back-button>
     </ion-buttons>
-    <ion-title>Product detail</ion-title>
     <ion-buttons slot="end">
-      <ion-button [routerLink]="['/cart']">
-        <ion-icon aria-hidden="true" name="cart"></ion-icon>
+      <ion-button (click)="toggleFavorite()" class="heart-button">
+        <ion-icon
+          [name]="isFavorite ? 'heart' : 'heart'"
+          [color]="isFavorite ? 'danger' : ''"
+          size="large"
+        ></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon name="share" size="large"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Product detail</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="property-detail-content">
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner></ion-spinner>
+  </div>
 
-  <ion-list *ngIf="product">
-    <ion-item>
-      <ion-label>
-        <h2>{{ product.name }}</h2>
-        <p>Type: {{ product.type }}</p>
-        <p>Price: {{ product.price }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  <!-- Property Detail -->
+  <div *ngIf="product && !loading" class="property-detail">
+    <!-- Image Carousel -->
+    <div class="image-carousel-container">
+      <swiper-container
+        #slides
+        [slidesPerView]="1"
+        [pagination]="false"
+        (swiperslidechange)="onSlideChange($event)"
+        class="image-carousel"
+      >
+        <!-- Main image -->
+        <swiper-slide *ngIf="product.image_url" class="slide">
+          <img [src]="product.image_url" alt="Property" class="property-image" />
+        </swiper-slide>
 
-  <ion-button expand="block" (click)="addToCart()" [disabled]="adding || !product">
-    Add to cart
-  </ion-button>
+        <!-- Gallery images -->
+        <swiper-slide *ngFor="let image of product.gallery" class="slide">
+          <img [src]="image" alt="Gallery" class="property-image" />
+        </swiper-slide>
+      </swiper-container>
 
-  <ion-button
-    expand="block"
-    color="secondary"
-    [routerLink]="['/booking-create']"
-    *ngIf="product"
-    [queryParams]="{ product_id: product.id }"
-  >
-    Book now
-  </ion-button>
+      <!-- Image indicators -->
+      <div class="carousel-indicators">
+        <span
+          *ngFor="let i of [].constructor(totalImages); let idx = index"
+          [class.active]="idx === activeSlide"
+          class="indicator"
+        ></span>
+      </div>
+    </div>
+
+    <!-- Property Title and Rating -->
+    <div class="property-header">
+      <div class="header-top">
+        <div class="title-section">
+          <h1 class="property-name">{{ product.name }}</h1>
+          <div class="rating-location">
+            <div class="rating">
+              <ion-icon name="star" size="small" class="star-icon"></ion-icon>
+              <span class="rating-value">{{ displayRating }}</span>
+              <span class="review-count">({{ product.review_count || 0 }} reviews)</span>
+            </div>
+            <div class="location" *ngIf="product.location">
+              <ion-icon name="location-outline" size="small"></ion-icon>
+              <span>{{ product.location }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Section -->
+      <div class="price-section">
+        <div class="price-info">
+          <span class="price">{{ product.price }}</span>
+          <span class="price-label">/night</span>
+        </div>
+        <ion-button color="primary" (click)="goToBooking()" class="book-button">
+          Book Now
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="section" *ngIf="product.description">
+      <p class="description">{{ product.description }}</p>
+    </div>
+
+    <!-- What this place offers -->
+    <div class="section amenities-section" *ngIf="product.amenities && product.amenities.length > 0">
+      <h2 class="section-title">What this place offers</h2>
+      <div class="amenities-grid">
+        <div class="amenity-item" *ngFor="let amenity of product.amenities.slice(0, 8)">
+          <div class="amenity-icon">
+            <ion-icon [name]="getAmenityIcon(amenity.name)"></ion-icon>
+          </div>
+          <span class="amenity-name">{{ amenity.name }}</span>
+        </div>
+      </div>
+      <ion-button fill="outline" expand="block" class="show-all-amenities">
+        Show all {{ product.amenities.length }} amenities
+      </ion-button>
+    </div>
+
+    <!-- Map Section -->
+    <div class="section map-section">
+      <h2 class="section-title">Where you'll be</h2>
+      <div class="map-container">
+        <div class="map-placeholder">
+          <ion-icon name="location-outline" size="large"></ion-icon>
+          <p>{{ product.location || 'Location' }}</p>
+          <small>Exact location provided after booking</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="section reviews-section" *ngIf="product.reviews && product.reviews.length > 0">
+      <div class="reviews-header">
+        <h2 class="section-title">Reviews</h2>
+        <ion-button fill="clear" color="primary">See all</ion-button>
+      </div>
+
+      <div class="reviews-grid">
+        <ion-card *ngFor="let review of product.reviews.slice(0, 2)" class="review-card">
+          <ion-card-content>
+            <div class="review-header">
+              <div class="reviewer-info">
+                <div class="reviewer-avatar" *ngIf="review.user_avatar">
+                  <img [src]="review.user_avatar" [alt]="review.user_name" />
+                </div>
+                <div class="reviewer-details">
+                  <p class="reviewer-name">{{ review.user_name }}</p>
+                  <p class="review-date">{{ review.date | date: 'MMM yyyy' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="review-rating">
+              <ion-icon
+                *ngFor="let star of [1, 2, 3, 4, 5]"
+                [name]="star <= review.rating ? 'star' : 'star-outline'"
+                size="small"
+                class="star"
+              ></ion-icon>
+            </div>
+
+            <p class="review-text">{{ review.comment }}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Booking Button at Bottom -->
+    <div class="bottom-action">
+      <ion-button expand="block" color="primary" (click)="goToBooking()" class="book-button-large">
+        Book Now
+      </ion-button>
+    </div>
+  </div>
 </ion-content>
