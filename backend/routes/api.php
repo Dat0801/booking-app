@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\AdminBookingController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\AdminCouponController;
 use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\AdminProductController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Api\V1\Admin\ImageController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\BookingController;
 use App\Http\Controllers\Api\V1\Customer\CartController;
+use App\Http\Controllers\Api\V1\Customer\CouponController;
 use App\Http\Controllers\Api\V1\Customer\OrderController;
 use App\Http\Controllers\Api\V1\Customer\ProductController;
 use App\Http\Controllers\Api\V1\Customer\ReviewController;
@@ -54,6 +56,8 @@ Route::prefix('v1')->group(function () {
         Route::put('reviews/{id}', [ReviewController::class, 'update']);
         Route::delete('reviews/{id}', [ReviewController::class, 'destroy']);
 
+        Route::post('coupons/validate', [CouponController::class, 'validateCoupon']);
+
         Route::middleware('role:admin')->prefix('admin')->group(function () {
             Route::get('dashboard/summary', [AdminDashboardController::class, 'summary']);
 
@@ -81,6 +85,8 @@ Route::prefix('v1')->group(function () {
 
             Route::post('images/upload', [ImageController::class, 'upload']);
             Route::delete('images', [ImageController::class, 'delete']);
+
+            Route::apiResource('coupons', AdminCouponController::class)->except(['create', 'edit']);
         });
     });
 });
