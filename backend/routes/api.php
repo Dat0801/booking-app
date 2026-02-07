@@ -60,6 +60,13 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware('role:admin')->prefix('admin')->group(function () {
             Route::get('dashboard/summary', [AdminDashboardController::class, 'summary']);
+            Route::get('dashboard/revenue', [AdminDashboardController::class, 'revenue']);
+            Route::get('dashboard/products', [AdminDashboardController::class, 'products']);
+            Route::get('dashboard/customers', [AdminDashboardController::class, 'customers']);
+
+            Route::get('reports/sales', [ReportController::class, 'sales']);
+            Route::get('reports/products', [ReportController::class, 'products']);
+            Route::get('reports/customers', [ReportController::class, 'customers']);
 
             Route::apiResource('categories', AdminCategoryController::class)->except(['create', 'edit']);
             Route::apiResource('products', AdminProductController::class)->except(['create', 'edit']);

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\CreateOrderRequest;
 use App\Models\Cart;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Notifications\OrderConfirmedNotification;
@@ -63,9 +65,25 @@ class OrderController extends Controller
             return $carry + ($item->quantity * $item->unit_price);
         }, 0);
 
+        $coupon = null;
+        $discountAmount = 0;
+
+        if (! empty($data['coupon_code'])) {
+            $coupon = Coupon::where('code', $data['coupon_code'])->first();
+
+            if ($coupon && $coupon->canBeUsedBy($user)) {
+                $discountAmount = $coupon->calculateDiscount($total);
+                $total = max(0, $total - $discountAmount);
+            } else {
+                return response()->json([
+                    'message' => 'Invalid or expired coupon code.',
+                ], 422);
+            }
+        }
+
         $order = null;
 
-        DB::transaction(function () use ($user, $cart, $data, $total, &$order) {
+        DB::transaction(function () use ($user, $cart, $data, $total, $coupon, $discountAmount, &$order) {
             $order = Order::create([
                 'user_id' => $user->id,
                 'cart_id' => $cart->id,
@@ -77,7 +95,23 @@ class OrderController extends Controller
                 'payment_method' => $data['payment_method'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'placed_at' => now(),
+                'coupon_id' => $coupon?->id,
+                'discount_amount' => $discountAmount,
             ]);
+
+            if ($coupon && $discountAmount > 0) {
+                CouponUsage::create([
+                    'coupon_id' => $coupon->id,
+                    'user_id' => $user->id,
+                    'discountable_type' => Order::class,
+                    'discountable_id' => $order->id,
+                    'discount_amount' => $discountAmount,
+                    'original_amount' => $total + $discountAmount,
+                    'final_amount' => $total,
+                ]);
+
+                $coupon->increment('used_count');
+            }
 
             foreach ($cart->items as $item) {
                 OrderItem::create([

@@ -17,6 +17,7 @@ class CreateOrderRequest extends FormRequest
             'cart_id' => ['required', 'integer', 'exists:carts,id'],
             'payment_method' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
+            'coupon_code' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

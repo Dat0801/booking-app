@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Booking\CreateBookingRequest;
 use App\Models\Booking;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Models\Product;
 use App\Notifications\BookingConfirmedNotification;
 use Illuminate\Http\JsonResponse;
@@ -64,6 +66,23 @@ class BookingController extends Controller
             ], 422);
         }
 
+        $totalAmount = $product->price;
+        $coupon = null;
+        $discountAmount = 0;
+
+        if (! empty($data['coupon_code'])) {
+            $coupon = Coupon::where('code', $data['coupon_code'])->first();
+
+            if ($coupon && $coupon->canBeUsedBy($user)) {
+                $discountAmount = $coupon->calculateDiscount($totalAmount);
+                $totalAmount = max(0, $totalAmount - $discountAmount);
+            } else {
+                return response()->json([
+                    'message' => 'Invalid or expired coupon code.',
+                ], 422);
+            }
+        }
+
         $booking = Booking::create([
             'user_id' => $user->id,
             'product_id' => $product->id,
@@ -73,9 +92,25 @@ class BookingController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
             'notes' => $data['notes'] ?? null,
-            'total_amount' => $product->price,
+            'total_amount' => $totalAmount,
             'payment_status' => 'unpaid',
+            'coupon_id' => $coupon?->id,
+            'discount_amount' => $discountAmount,
         ]);
+
+        if ($coupon && $discountAmount > 0) {
+            CouponUsage::create([
+                'coupon_id' => $coupon->id,
+                'user_id' => $user->id,
+                'discountable_type' => Booking::class,
+                'discountable_id' => $booking->id,
+                'discount_amount' => $discountAmount,
+                'original_amount' => $product->price,
+                'final_amount' => $totalAmount,
+            ]);
+
+            $coupon->increment('used_count');
+        }
 
         $booking->load(['product', 'user', 'payments']);
 
