@@ -1,20 +1,25 @@
 <?php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Auth\AuthController;
-use App\Http\Controllers\Api\V1\Customer\ProductController;
-use App\Http\Controllers\Api\V1\Customer\CartController;
-use App\Http\Controllers\Api\V1\Customer\OrderController;
-use App\Http\Controllers\Api\V1\Customer\BookingController;
-use App\Http\Controllers\Api\V1\Admin\AdminProductController;
-use App\Http\Controllers\Api\V1\Admin\AdminOrderController;
+
 use App\Http\Controllers\Api\V1\Admin\AdminBookingController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
-use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
+use App\Http\Controllers\Api\V1\Admin\AdminOrderController;
+use App\Http\Controllers\Api\V1\Admin\AdminProductController;
+use App\Http\Controllers\Api\V1\Admin\AdminReviewController;
+use App\Http\Controllers\Api\V1\Admin\AdminUserController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Customer\BookingController;
+use App\Http\Controllers\Api\V1\Customer\CartController;
+use App\Http\Controllers\Api\V1\Customer\OrderController;
+use App\Http\Controllers\Api\V1\Customer\ProductController;
+use App\Http\Controllers\Api\V1\Customer\ReviewController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('auth/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::get('categories', [ProductController::class, 'categories']);
     Route::get('products', [ProductController::class, 'index']);
@@ -23,6 +28,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('auth/me', [AuthController::class, 'me']);
         Route::post('auth/logout', [AuthController::class, 'logout']);
+        Route::get('auth/email/verify', [AuthController::class, 'verifyEmail'])->name('verification.verify');
+        Route::post('auth/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])->name('verification.send');
 
         Route::get('cart', [CartController::class, 'show']);
         Route::post('cart/items', [CartController::class, 'store']);
@@ -39,6 +46,12 @@ Route::prefix('v1')->group(function () {
         Route::get('bookings/{id}', [BookingController::class, 'show']);
         Route::post('bookings', [BookingController::class, 'store']);
         Route::post('bookings/{id}/cancel', [BookingController::class, 'cancel']);
+
+        Route::get('reviews', [ReviewController::class, 'index']);
+        Route::get('reviews/{id}', [ReviewController::class, 'show']);
+        Route::post('reviews', [ReviewController::class, 'store']);
+        Route::put('reviews/{id}', [ReviewController::class, 'update']);
+        Route::delete('reviews/{id}', [ReviewController::class, 'destroy']);
 
         Route::middleware('role:admin')->prefix('admin')->group(function () {
             Route::get('dashboard/summary', [AdminDashboardController::class, 'summary']);
@@ -59,6 +72,11 @@ Route::prefix('v1')->group(function () {
             Route::patch('users/{id}/roles', [AdminUserController::class, 'updateRoles']);
             Route::delete('users/{id}', [AdminUserController::class, 'destroy']);
             Route::patch('users/{id}/restore', [AdminUserController::class, 'restore']);
+
+            Route::get('reviews', [AdminReviewController::class, 'index']);
+            Route::get('reviews/{id}', [AdminReviewController::class, 'show']);
+            Route::patch('reviews/{id}/status', [AdminReviewController::class, 'updateStatus']);
+            Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy']);
         });
     });
 });

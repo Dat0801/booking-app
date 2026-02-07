@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Notifications\BookingConfirmedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,10 @@ class AdminBookingController extends Controller
         if ($request->filled('search')) {
             $search = $request->string('search')->toString();
             $query->where(function ($q) use ($search) {
-                $q->where('booking_number', 'like', '%' . $search . '%')
+                $q->where('booking_number', 'like', '%'.$search.'%')
                     ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%');
+                        $uq->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%');
                     });
             });
         }
@@ -74,8 +75,9 @@ class AdminBookingController extends Controller
             'payment_status' => ['sometimes', 'nullable', 'string', 'max:50'],
         ]);
 
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with(['user', 'product'])->findOrFail($id);
 
+        $oldStatus = $booking->status;
         $booking->status = $data['status'];
 
         if (array_key_exists('payment_status', $data)) {
@@ -84,7 +86,10 @@ class AdminBookingController extends Controller
 
         $booking->save();
 
+        if ($oldStatus !== $booking->status && in_array($booking->status, ['confirmed', 'completed'], true)) {
+            $booking->user->notify(new BookingConfirmedNotification($booking));
+        }
+
         return response()->json($booking);
     }
 }
-

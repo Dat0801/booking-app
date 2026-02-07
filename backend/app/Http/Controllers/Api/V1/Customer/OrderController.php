@@ -7,6 +7,7 @@ use App\Http\Requests\Order\CreateOrderRequest;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Notifications\OrderConfirmedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -68,7 +69,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'cart_id' => $cart->id,
-                'order_number' => 'ORD-' . now()->format('YmdHis') . '-' . $user->id,
+                'order_number' => 'ORD-'.now()->format('YmdHis').'-'.$user->id,
                 'status' => 'pending',
                 'total_amount' => $total,
                 'currency' => 'USD',
@@ -94,7 +95,9 @@ class OrderController extends Controller
             $cart->save();
         });
 
-        $order->load(['items.product', 'payments']);
+        $order->load(['items.product', 'user', 'payments']);
+
+        $user->notify(new OrderConfirmedNotification($order));
 
         return response()->json($order, 201);
     }
@@ -124,4 +127,3 @@ class OrderController extends Controller
         return response()->json($order);
     }
 }
-
