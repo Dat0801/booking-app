@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
-use Carbon\Carbon;
+use App\Notifications\BookingConfirmedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -20,14 +20,10 @@ class AdminBookingController extends Controller
         if ($request->filled('search')) {
             $search = $request->string('search')->toString();
             $query->where(function ($q) use ($search) {
-                $q->where('booking_number', 'like', '%' . $search . '%')
+                $q->where('booking_number', 'like', '%'.$search.'%')
                     ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('product', function ($pq) use ($search) {
-                        $pq->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('location', 'like', '%' . $search . '%');
+                        $uq->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%');
                     });
             });
         }
@@ -102,8 +98,9 @@ class AdminBookingController extends Controller
             'payment_status' => ['sometimes', 'nullable', 'string', 'in:unpaid,pending,paid,failed,refunded,partially_paid'],
         ]);
 
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with(['user', 'product'])->findOrFail($id);
 
+        $oldStatus = $booking->status;
         $booking->status = $data['status'];
 
         if (array_key_exists('payment_status', $data)) {
@@ -112,90 +109,10 @@ class AdminBookingController extends Controller
 
         $booking->save();
 
-        return response()->json(new BookingResource($booking));
-    }
+        if ($oldStatus !== $booking->status && in_array($booking->status, ['confirmed', 'completed'], true)) {
+            $booking->user->notify(new BookingConfirmedNotification($booking));
+        }
 
-    /**
-     * Get booking statistics for dashboard
-     */
-    public function statistics(Request $request): JsonResponse
-    {
-        $currentMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-
-        // Get statistics for current month
-        $monthlyRevenue = Booking::whereBetween('scheduled_date', [$currentMonth, $endOfMonth])
-            ->where('payment_status', 'paid')
-            ->sum('total_amount');
-
-        // Status counts
-        $statusCounts = Booking::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
-
-        // Payment status counts
-        $paymentStatusCounts = Booking::selectRaw('payment_status, COUNT(*) as count')
-            ->groupBy('payment_status')
-            ->pluck('count', 'payment_status')
-            ->toArray();
-
-        $stats = [
-            'monthly_revenue' => [
-                'value' => (float) $monthlyRevenue,
-                'formatted' => '$' . number_format((float) $monthlyRevenue, 2),
-            ],
-            'total_bookings' => Booking::count(),
-            'status_breakdown' => [
-                'all' => Booking::count(),
-                'pending' => $statusCounts['pending'] ?? 0,
-                'confirmed' => $statusCounts['confirmed'] ?? 0,
-                'completed' => $statusCounts['completed'] ?? 0,
-                'cancelled' => $statusCounts['cancelled'] ?? 0,
-            ],
-            'payment_summary' => [
-                'paid' => [
-                    'count' => Booking::where('payment_status', 'paid')->count(),
-                    'amount' => (float) Booking::where('payment_status', 'paid')->sum('total_amount'),
-                    'amount_formatted' => '$' . number_format((float) Booking::where('payment_status', 'paid')->sum('total_amount'), 2),
-                ],
-                'pending' => [
-                    'count' => Booking::where('payment_status', 'pending')->count(),
-                    'amount' => (float) Booking::where('payment_status', 'pending')->sum('total_amount'),
-                    'amount_formatted' => '$' . number_format((float) Booking::where('payment_status', 'pending')->sum('total_amount'), 2),
-                ],
-                'unpaid' => [
-                    'count' => Booking::where('payment_status', 'unpaid')->count(),
-                    'amount' => (float) Booking::where('payment_status', 'unpaid')->sum('total_amount'),
-                    'amount_formatted' => '$' . number_format((float) Booking::where('payment_status', 'unpaid')->sum('total_amount'), 2),
-                ],
-            ],
-        ];
-
-        return response()->json($stats);
-    }
-
-    /**
-     * Get filter options (status list, etc.)
-     */
-    public function filterOptions(): JsonResponse
-    {
-        return response()->json([
-            'statuses' => [
-                ['value' => 'all', 'label' => 'All', 'count' => Booking::count()],
-                ['value' => 'pending', 'label' => 'Pending', 'count' => Booking::where('status', 'pending')->count()],
-                ['value' => 'confirmed', 'label' => 'Confirmed', 'count' => Booking::where('status', 'confirmed')->count()],
-                ['value' => 'completed', 'label' => 'Completed', 'count' => Booking::where('status', 'completed')->count()],
-                ['value' => 'cancelled', 'label' => 'Cancelled', 'count' => Booking::where('status', 'cancelled')->count()],
-            ],
-            'payment_statuses' => [
-                ['value' => 'paid', 'label' => 'Paid'],
-                ['value' => 'pending', 'label' => 'Pending'],
-                ['value' => 'unpaid', 'label' => 'Unpaid'],
-                ['value' => 'failed', 'label' => 'Failed'],
-                ['value' => 'refunded', 'label' => 'Refunded'],
-            ],
-        ]);
+        return response()->json($booking);
     }
 }
-

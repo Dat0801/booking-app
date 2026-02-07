@@ -21,10 +21,13 @@ class Order extends Model
         'payment_method',
         'notes',
         'placed_at',
+        'coupon_id',
+        'discount_amount',
     ];
 
     protected $casts = [
         'placed_at' => 'datetime',
+        'discount_amount' => 'decimal:2',
     ];
 
     public function user()
@@ -45,5 +48,15 @@ class Order extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    public function couponUsage()
+    {
+        return $this->morphOne(CouponUsage::class, 'discountable');
     }
 }

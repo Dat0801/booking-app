@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Notifications\OrderConfirmedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,10 @@ class AdminOrderController extends Controller
         if ($request->filled('search')) {
             $search = $request->string('search')->toString();
             $query->where(function ($q) use ($search) {
-                $q->where('order_number', 'like', '%' . $search . '%')
+                $q->where('order_number', 'like', '%'.$search.'%')
                     ->orWhereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%');
+                        $uq->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%');
                     });
             });
         }
@@ -70,8 +71,9 @@ class AdminOrderController extends Controller
             'payment_status' => ['sometimes', 'nullable', 'string', 'max:50'],
         ]);
 
-        $order = Order::findOrFail($id);
+        $order = Order::with(['user', 'items.product'])->findOrFail($id);
 
+        $oldStatus = $order->status;
         $order->status = $data['status'];
 
         if (array_key_exists('payment_status', $data)) {
@@ -80,7 +82,10 @@ class AdminOrderController extends Controller
 
         $order->save();
 
+        if ($oldStatus !== $order->status && in_array($order->status, ['confirmed', 'processing', 'completed'], true)) {
+            $order->user->notify(new OrderConfirmedNotification($order));
+        }
+
         return response()->json($order);
     }
 }
-
