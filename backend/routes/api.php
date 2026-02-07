@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\AdminProductController;
 use App\Http\Controllers\Api\V1\Admin\AdminReviewController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserController;
+use App\Http\Controllers\Api\V1\Admin\ImageController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\BookingController;
 use App\Http\Controllers\Api\V1\Customer\CartController;
@@ -77,6 +78,9 @@ Route::prefix('v1')->group(function () {
             Route::get('reviews/{id}', [AdminReviewController::class, 'show']);
             Route::patch('reviews/{id}/status', [AdminReviewController::class, 'updateStatus']);
             Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy']);
+
+            Route::post('images/upload', [ImageController::class, 'upload']);
+            Route::delete('images', [ImageController::class, 'delete']);
         });
     });
 });

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\File;
 
 class AdminProductController extends Controller
 {
@@ -17,9 +19,9 @@ class AdminProductController extends Controller
         if ($request->filled('search')) {
             $search = $request->string('search')->toString();
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('slug', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('slug', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%');
             });
         }
 
@@ -60,7 +62,17 @@ class AdminProductController extends Controller
             'stock_quantity' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'image_url' => ['nullable', 'string', 'max:2048'],
+            'image' => [
+                'sometimes',
+                File::image()
+                    ->max(5120),
+            ],
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $data['image_url'] = Storage::disk('public')->url($path);
+        }
 
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['name']);
@@ -95,7 +107,24 @@ class AdminProductController extends Controller
             'stock_quantity' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'image_url' => ['sometimes', 'nullable', 'string', 'max:2048'],
+            'image' => [
+                'sometimes',
+                File::image()
+                    ->max(5120),
+            ],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($product->image_url) {
+                $oldPath = str_replace(Storage::disk('public')->url(''), '', $product->image_url);
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            $path = $request->file('image')->store('products', 'public');
+            $data['image_url'] = Storage::disk('public')->url($path);
+        }
 
         if (array_key_exists('name', $data) && (! array_key_exists('slug', $data) || $data['slug'] === null)) {
             $data['slug'] = Str::slug($data['name']);
@@ -113,4 +142,3 @@ class AdminProductController extends Controller
         return response()->json(null, 204);
     }
 }
-
