@@ -1,0 +1,238 @@
+ion-header {
+  ion-toolbar {
+    --background: #fff;
+    --border-color: #e0e0e0;
+
+    .header-title {
+      h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: #000;
+      }
+
+      p.date-range {
+        font-size: 14px;
+        color: #666;
+        margin: 2px 0 0 0;
+      }
+    }
+  }
+
+  .filter-toolbar {
+    --background: #fff;
+    padding: 8px 12px;
+
+    ion-segment {
+      --background: transparent;
+      
+      ion-segment-button {
+        --background: #fff;
+        --background-checked: #f0f0f0;
+        --color: #666;
+        --color-checked: #000;
+        --border-radius: 20px;
+        --border-width: 1px;
+        --border-color: #ddd;
+        --indicator-color: transparent;
+        min-width: 70px;
+        margin: 0 4px;
+        font-size: 14px;
+        text-transform: none;
+
+        ion-icon {
+          font-size: 12px;
+          margin-left: 4px;
+        }
+      }
+    }
+  }
+}
+
+ion-content {
+  --background: #f5f5f5;
+
+  .property-count {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .property-list {
+    background: transparent;
+    padding: 12px;
+
+    .property-card {
+      background: #fff;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .property-image-container {
+        position: relative;
+        width: 100%;
+        height: 240px;
+        overflow: hidden;
+
+        .property-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .favorite-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          --background: rgba(255, 255, 255, 0.9);
+          --border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          margin: 0;
+
+          ion-icon {
+            font-size: 24px;
+          }
+        }
+      }
+
+      .property-details {
+        padding: 16px;
+        cursor: pointer;
+
+        .property-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 8px;
+
+          .property-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            margin: 0;
+            flex: 1;
+            padding-right: 12px;
+          }
+
+          .property-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+
+            ion-icon {
+              font-size: 16px;
+            }
+
+            span {
+              font-size: 14px;
+              font-weight: 600;
+              color: #000;
+            }
+          }
+        }
+
+        .property-info {
+          margin-bottom: 12px;
+
+          .reviews-distance {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+          }
+        }
+
+        .property-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .price-container {
+            .price {
+              font-size: 20px;
+              font-weight: 700;
+              color: #000;
+            }
+
+            .per-night {
+              font-size: 14px;
+              color: #666;
+            }
+          }
+
+          .view-btn {
+            --background: #007aff;
+            --background-hover: #0051d5;
+            --border-radius: 8px;
+            --padding-start: 24px;
+            --padding-end: 24px;
+            height: 40px;
+            font-weight: 600;
+            text-transform: none;
+          }
+        }
+      }
+    }
+  }
+
+  .loading-state,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+
+    ion-spinner {
+      margin-bottom: 16px;
+    }
+
+    ion-icon {
+      font-size: 64px;
+      color: #ccc;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+      margin: 0;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (min-width: 768px) {
+  ion-content {
+    .property-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+
+      .property-card {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  ion-content {
+    .property-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}

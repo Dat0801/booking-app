@@ -1,44 +1,348 @@
+:host {
+  --ion-background-color: #f8f9fa;
+}
+
+ion-toolbar {
+  --background: white;
+  --border-color: #e0e0e0;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  ion-icon {
+    font-size: 24px;
+    color: #1a1a1a;
+  }
+}
+
 .home-content {
-  --background: #f4f5f8;
+  --background: #f8f9fa;
 }
 
-.hero {
-  padding: 24px 16px 12px;
+// Search Section
+.search-section {
+  padding: 16px;
 }
 
-.hero h1 {
-  font-size: 24px;
-  margin: 0 0 4px;
-  font-weight: 600;
-}
-
-.hero p {
-  margin: 0 0 16px;
-  color: #6b6b6b;
-  font-size: 14px;
-}
-
-.search-bar {
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
   border-radius: 12px;
-  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: 56px;
+
+  ion-icon:first-child {
+    color: #0066cc;
+    font-size: 20px;
+  }
+
+  .search-text {
+    font-size: 12px;
+    color: #999;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .search-placeholder {
+    flex: 1;
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  .filter-icon {
+    color: #0066cc;
+    font-size: 20px;
+  }
 }
 
-.section {
-  padding: 8px 16px 16px;
+// Categories Section
+.categories-section {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  .category-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 24px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+
+    ion-icon {
+      font-size: 20px;
+      color: #666;
+    }
+
+    &.active {
+      background: #0066cc;
+      color: white;
+      border-color: #0066cc;
+
+      ion-icon {
+        color: white;
+      }
+    }
+
+    &:hover:not(.active) {
+      background: #f0f0f0;
+    }
+  }
 }
 
+// Section Headers
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.section-header h2 {
-  font-size: 18px;
+  padding: 16px 16px 12px;
   margin: 0;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  .see-all,
+  .limited-time {
+    font-size: 13px;
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .limited-time {
+    color: #ff4444;
+    background: #ffe6e6;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
 }
 
-.action-card {
-  height: 100%;
+// Featured Destinations Section
+.featured-section {
+  padding-bottom: 16px;
+}
+
+.destinations-carousel {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.destination-card {
+  flex-shrink: 0;
+  width: 280px;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4));
+  }
+
+  .favorite-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(100, 100, 100, 0.6);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+
+    ion-icon {
+      color: white;
+      font-size: 20px;
+    }
+  }
+
+  .destination-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    color: white;
+    z-index: 2;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+
+    p {
+      font-size: 12px;
+      margin: 0;
+      opacity: 0.9;
+    }
+  }
+}
+
+// Last Minute Deals Section
+.deals-section {
+  padding: 16px 0;
+}
+
+.deals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.deal-card {
+  display: flex;
+  gap: 12px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.deal-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+}
+
+.deal-info {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.deal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+
+    ion-icon {
+      color: #ffb800;
+      font-size: 14px;
+    }
+  }
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+  margin: 4px 0 8px;
+
+  ion-icon {
+    font-size: 14px;
+    color: #999;
+  }
+}
+
+.deal-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .original-price {
+    font-size: 12px;
+    color: #999;
+    text-decoration: line-through;
+  }
+
+  .price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0066cc;
+  }
+
+  .per-night {
+    font-size: 12px;
+    color: #999;
+  }
+
+  .book-btn {
+    margin-left: auto;
+    padding: 8px 20px;
+    background: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:active {
+      background: #0052a3;
+    }
+  }
 }

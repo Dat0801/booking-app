@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,20 @@ class AdminDashboardController extends Controller
             ->orderByDesc('scheduled_date')
             ->limit(5)
             ->get();
+
+        // Booking-specific statistics
+        $monthlyBookingRevenue = Booking::whereBetween('scheduled_date', [$currentMonth, $endOfMonth])
+            ->sum('total_amount');
+        
+        $pendingApprovals = Booking::where('status', 'pending')->count();
+        $confirmedBookings = Booking::where('status', 'confirmed')->count();
+        $completedBookings = Booking::where('status', 'completed')->count();
+        $cancelledBookings = Booking::where('status', 'cancelled')->count();
+
+        // Payment statistics
+        $paidBookings = Booking::where('payment_status', 'paid')->sum('total_amount');
+        $unpaidBookings = Booking::where('payment_status', 'unpaid')->sum('total_amount');
+        $pendingPayments = Booking::where('payment_status', 'pending')->count();
 
         return response()->json([
             'users_count' => $usersCount,
