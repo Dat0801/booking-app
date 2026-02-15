@@ -20,6 +20,7 @@ class CreateBookingRequest extends FormRequest
             'end_time' => ['nullable', 'date_format:H:i', 'after_or_equal:start_time'],
             'notes' => ['nullable', 'string'],
             'total_amount' => ['required', 'numeric', 'min:0'],
+            'coupon_code' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

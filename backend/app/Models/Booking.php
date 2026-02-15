@@ -21,12 +21,15 @@ class Booking extends Model
         'notes',
         'total_amount',
         'payment_status',
+        'coupon_id',
+        'discount_amount',
     ];
 
     protected $casts = [
         'scheduled_date' => 'date',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
+        'discount_amount' => 'decimal:2',
     ];
 
     public function user()
@@ -42,5 +45,20 @@ class Booking extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    public function couponUsage()
+    {
+        return $this->morphOne(CouponUsage::class, 'discountable');
     }
 }
